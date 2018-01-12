@@ -39,12 +39,12 @@ module.exports = ({protobufs}) => {
             break
 
           case 'map': // FIXME
-            validation = Joi.string()
+            validation = Joi.any()
             break
 
           default:
             const childEnum = message.enums.find(_enum => _enum.name === field.type) || protobufSchema.enums.find(_enum => _enum.name === field.type)
-            const childMessage = protobufSchema.messages.find(message => message.name === field.type)
+            const childMessage = message.messages.find(_message => _message.name === field.type) || protobufSchema.messages.find(message => message.name === field.type)
 
             validation = childEnum
               ? Joi.string().valid(Object.keys(childEnum.values))

@@ -5,6 +5,7 @@ message Basic {
 
 message Map {
   map<string, string> foo = 1;
+  map<string, int64> bar = 2;
 }
 
 message UTF8 {
@@ -37,8 +38,8 @@ message Float {
 }
 
 message Packed {
-  repeated Basic list = 1 [packed=true];
-  repeated string packed = 2 [packed=true];
+  repeated Basic list = 1;
+  repeated string packed = 2;
 }
 
 message NotPacked {
@@ -48,6 +49,13 @@ message NotPacked {
 message FalsePacked {
   repeated int64 id = 2 [packed=false];
   optional int64 value = 5;
+}
+
+message EmbeddedNested {
+  message Nest {
+    string nested_string = 1;
+  }
+  Nest nest = 1;
 }
 
 enum FOO {

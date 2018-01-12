@@ -56,7 +56,8 @@ test('protobufToJoi with test.proto', t => {
     t.plan(1)
 
     const mapTestData = {
-      foo: 'test'
+      foo: 'test',
+      bar: 17
     }
 
     validateDataAgainstJoiValidation(mapTestData, protobufToJoi.Map)
@@ -90,6 +91,36 @@ test('protobufToJoi with test.proto', t => {
     }
 
     validateDataAgainstJoiValidation(nestedTestData, protobufToJoi.Nested)
+      .then(res => t.deepEqual(res, nestedTestData))
+      .catch(err => console.error(err))
+  })
+
+  t.test('should not validate Nested with invalid nestedTestData.meh.num', t => {
+    t.plan(1)
+
+    const nestedTestData = {
+      num: 1,
+      payload: new Buffer('lol'),
+      meh: {
+        num: 'sdfsd',
+        payload: new Buffer('bar')
+      }
+    }
+
+    validateDataAgainstJoiValidation(nestedTestData, protobufToJoi.Nested)
+      .catch(err => t.equal(err.message, 'child "meh" fails because [child "num" fails because ["num" must be a number]]'))
+  })
+
+  t.test('should validate EmbeddedNested with nestedTestData', t => {
+    t.plan(1)
+
+    const nestedTestData = {
+      nest: {
+        nested_string: 'string'
+      }
+    }
+
+    validateDataAgainstJoiValidation(nestedTestData, protobufToJoi.EmbeddedNested)
       .then(res => t.deepEqual(res, nestedTestData))
       .catch(err => console.error(err))
   })
