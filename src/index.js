@@ -1,7 +1,7 @@
 const Joi = require('joi')
 const schema = require('protocol-buffers-schema')
 
-module.exports = ({protobufs}) => {
+module.exports = (protobufs) => {
   const protobufSchema = schema.parse(protobufs)
   return protobufSchema.messages.reduce((joiValidations, message) => {
     const createJoiValidationFromMessage = (message) => {

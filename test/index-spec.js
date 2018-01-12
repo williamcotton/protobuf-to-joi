@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const protobufs = fs.readFileSync(path.join(__dirname, './test.proto'))
 
-const protobufToJoi = require('../src')({protobufs})
+const protobufToJoi = require('../src')(protobufs)
 
 const Joi = require('joi')
 const validateDataAgainstJoiValidation = (data, joiValidation) => new Promise((resolve, reject) => {

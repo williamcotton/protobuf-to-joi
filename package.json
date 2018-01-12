@@ -1,6 +1,6 @@
 {
-  "name": "protobuf-to-joi",
-  "version": "1.0.0",
+  "name": "@shoaltogether/protobuf-to-joi",
+  "version": "2.0.0",
   "description": "Protobuf to Joi validations",
   "main": "src/index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/williamcotton/protobuf-to-joi.git"
+    "url": "git+https://github.com/shoaltogether/protobuf-to-joi.git"
   },
   "keywords": [
     "protobuf",
@@ -18,9 +18,9 @@
   "author": "William Cotton",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/williamcotton/protobuf-to-joi/issues"
+    "url": "https://github.com/shoaltogether/protobuf-to-joi/issues"
   },
-  "homepage": "https://github.com/williamcotton/protobuf-to-joi#readme",
+  "homepage": "https://github.com/shoaltogether/protobuf-to-joi#readme",
   "devDependencies": {
     "tape": "^4.6.0"
   },
