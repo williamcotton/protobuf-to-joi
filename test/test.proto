@@ -3,6 +3,11 @@ message Basic {
   required bytes payload = 2;
 }
 
+message Strings {
+  string foo = 1;
+  string bar = 2;
+}
+
 message Map {
   map<string, string> foo = 1;
   map<string, int64> bar = 2;

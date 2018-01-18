@@ -1,7 +1,7 @@
 const Joi = require('joi')
 const schema = require('protocol-buffers-schema')
 
-module.exports = (protobufs) => {
+module.exports = (protobufs, emptyMatchers) => {
   const protobufSchema = schema.parse(protobufs)
   return protobufSchema.messages.reduce((joiValidations, message) => {
     const createJoiValidationFromMessage = (message) => {
@@ -85,6 +85,12 @@ module.exports = (protobufs) => {
 
         validation = field.required
           ? validation.required()
+          : validation
+
+        const setDefaultMatchers = (val) => v.empty(emptyMatchers);
+
+        validation = emptyMatchers
+          ? validation.empty(emptyMatchers)
           : validation
 
         schema[field.name] = validation

@@ -461,5 +461,32 @@ test('protobufToJoi with test.proto', t => {
       .catch(err => console.error(err))
   })
 
+  t.test('should not validate empty strings', t => {
+    t.plan(1)
+
+    const utf8TestData = {
+      foo: '',
+      bar: 42
+    }
+
+    validateDataAgainstJoiValidation(utf8TestData, protobufToJoi.UTF8)
+      .catch(err => t.equal(err.message, 'child "foo" fails because ["foo" is not allowed to be empty]'))
+  })
+
+  t.test('should validate empty strings when empty matcher value is passed into initialiser', t => {
+    t.plan(1)
+
+    const protobufToJoiWithEmpties = require('../src')(protobufs, ['', null])
+
+    const emptyStringTestData = {
+      foo: '',
+      bar: null
+    }
+
+    validateDataAgainstJoiValidation(emptyStringTestData, protobufToJoiWithEmpties.Strings)
+      .then(res => t.deepEqual(res, {}))
+      .catch(err => console.error(err))
+  })
+
   t.end()
 })
