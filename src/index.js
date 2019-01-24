@@ -1,7 +1,7 @@
 const Joi = require("joi");
 const schema = require("protocol-buffers-schema");
 
-module.exports = (protobufs, emptyMatchers) => {
+module.exports = (protobufs, emptyMatchers, enumsAsIntegers) => {
   const protobufSchema = schema.parse(protobufs);
   return protobufSchema.messages.reduce((joiValidations, message) => {
     const createJoiValidationFromMessage = message => {
@@ -58,7 +58,7 @@ module.exports = (protobufs, emptyMatchers) => {
                 );
 
               validation = childEnum
-                ? Joi.string().valid(Object.keys(childEnum.values))
+                ? getEnumType(childEnum, enumsAsIntegers)
                 : childMessage
                 ? createJoiValidationFromMessage(childMessage)
                 : validation;
@@ -127,3 +127,12 @@ module.exports = (protobufs, emptyMatchers) => {
     return joiValidations;
   }, {});
 };
+
+const getEnumType = (childEnum, enumsAsIntegers) =>
+  enumsAsIntegers
+    ? Joi.number()
+        .integer()
+        .valid(
+          Object.keys(childEnum.values).map(v => childEnum.values[v].value)
+        )
+    : Joi.string().valid(Object.keys(childEnum.values));

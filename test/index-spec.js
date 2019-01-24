@@ -633,5 +633,36 @@ test("protobufToJoi with test.proto", t => {
     }
   );
 
+  t.test(
+    "should validate enums as integers when enumsAsIntegers value is passed into initialiser",
+    t => {
+      t.plan(1);
+
+      const protobufToJoiWithEnumsAsStrings = require("../src")(
+        protobufs,
+        null,
+        true
+      );
+
+      const enumsAsIntegersTestData = {
+        foo1: 1,
+        foo2: 2
+      };
+
+      validateDataAgainstJoiValidation(
+        enumsAsIntegersTestData,
+        protobufToJoiWithEnumsAsStrings.Defaults
+      )
+        .then(res =>
+          t.deepEqual(res, {
+            foo1: 1,
+            foo2: 2,
+            num: 42
+          })
+        )
+        .catch(err => console.error(err));
+    }
+  );
+
   t.end();
 });
