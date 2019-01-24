@@ -22,10 +22,11 @@
   },
   "homepage": "https://github.com/shoaltogether/protobuf-to-joi#readme",
   "devDependencies": {
+    "prettier": "1.16.1",
     "tape": "^4.6.0"
   },
   "dependencies": {
-    "joi": "^13.1.0",
+    "joi": "^14.3.1",
     "protocol-buffers": "^3.1.6",
     "protocol-buffers-schema": "^3.1.0"
   }
