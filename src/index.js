@@ -1,4 +1,4 @@
-const Joi = require("joi");
+const Joi = require("@hapi/joi");
 const schema = require("protocol-buffers-schema");
 
 module.exports = (protobufs, emptyMatchers, enumsAsIntegers) => {
