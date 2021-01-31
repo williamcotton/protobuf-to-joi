@@ -1,10 +1,11 @@
-const Joi = require("@hapi/joi");
+const Joi = require("joi");
 const schema = require("protocol-buffers-schema");
 
 module.exports = (protobufs, emptyMatchers, enumsAsIntegers) => {
   const protobufSchema = schema.parse(protobufs);
+
   return protobufSchema.messages.reduce((joiValidations, message) => {
-    const createJoiValidationFromMessage = message => {
+    const createJoiValidationFromMessage = (message, parent) => {
       return Joi.object().keys(
         message.fields.reduce((schema, field) => {
           let validation;
@@ -21,9 +22,7 @@ module.exports = (protobufs, emptyMatchers, enumsAsIntegers) => {
 
             case "uint64":
             case "uint32":
-              validation = Joi.number()
-                .integer()
-                .min(0);
+              validation = Joi.number().integer().min(0);
               break;
 
             case "int32":
@@ -41,30 +40,41 @@ module.exports = (protobufs, emptyMatchers, enumsAsIntegers) => {
               validation = Joi.string();
               break;
 
-            case "map": // FIXME
-              validation = Joi.any();
+            case "map":
+              validation = Joi.object();
               break;
 
             default:
               const childEnum =
-                message.enums.find(_enum => _enum.name === field.type) ||
-                protobufSchema.enums.find(_enum => _enum.name === field.type);
+                message.enums.find((_enum) => _enum.name === field.type) ||
+                protobufSchema.enums.find((_enum) => _enum.name === field.type);
+
+              if (childEnum) {
+                validation = getEnumType(childEnum, enumsAsIntegers);
+                break;
+              }
+
               const childMessage =
                 message.messages.find(
-                  _message => _message.name === field.type
+                  (_message) => _message.name === field.type
                 ) ||
                 protobufSchema.messages.find(
-                  message => message.name === field.type
+                  (message) => message.name === field.type
                 );
-
-              validation = childEnum
-                ? getEnumType(childEnum, enumsAsIntegers)
-                : childMessage
-                ? createJoiValidationFromMessage(childMessage)
-                : validation;
+              if (childMessage) {
+                if (childMessage === parent) {
+                  validation = Joi.any();
+                } else {
+                  validation = createJoiValidationFromMessage(
+                    childMessage,
+                    message
+                  );
+                }
+                break;
+              }
           }
 
-          const toType = val => {
+          const toType = (val) => {
             switch (field.type) {
               case "bool":
                 return !!val;
@@ -96,7 +106,7 @@ module.exports = (protobufs, emptyMatchers, enumsAsIntegers) => {
 
           validation = field.required ? validation.required() : validation;
 
-          const setDefaultMatchers = val => v.empty(emptyMatchers);
+          const setDefaultMatchers = (val) => v.empty(emptyMatchers);
 
           validation = emptyMatchers
             ? validation.empty(emptyMatchers)
@@ -118,8 +128,8 @@ module.exports = (protobufs, emptyMatchers, enumsAsIntegers) => {
       return oneOfFields;
     }, {});
 
-    Object.keys(oneOfFields).forEach(oneOf => {
-      joiValidation = joiValidation.xor(oneOfFields[oneOf]);
+    Object.keys(oneOfFields).forEach((oneOf) => {
+      joiValidation = joiValidation.xor(...oneOfFields[oneOf]);
     });
 
     joiValidations[message.name] = joiValidation;
@@ -133,6 +143,6 @@ const getEnumType = (childEnum, enumsAsIntegers) =>
     ? Joi.number()
         .integer()
         .valid(
-          Object.keys(childEnum.values).map(v => childEnum.values[v].value)
+          ...Object.keys(childEnum.values).map((v) => childEnum.values[v].value)
         )
-    : Joi.string().valid(Object.keys(childEnum.values));
+    : Joi.string().valid(...Object.keys(childEnum.values));
